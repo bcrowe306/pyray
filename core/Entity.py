@@ -13,9 +13,8 @@ class Entity(EventObject):
         self.name: str = name
         self.components: dict[type, Component] = {}
 
-    def add_component(self, component: Component) -> Component:
+    def add_component(self, component: Component):
         self.components[type(component)] = component
-        return component
 
     def get_component(self, component_type) -> object:
         return self.components.get(component_type)

@@ -1,15 +1,12 @@
-from pyray import Vector2, init_window, set_target_fps, get_frame_time, get_time, get_fps, begin_drawing, clear_background, end_drawing, close_window, window_should_close, is_mouse_button_pressed, get_mouse_position
-from pyray import MouseButton, RED, RAYWHITE
+import pyray as rl
+from pyray import Vector2, MouseButton, KeyboardKey
 from core.EntityManager import EntityManager
 from core.GameContext import GameContext
 from core.SystemsManager import SystemsManager
 from core.systems.RectangleSystem import RectangleSystem
 from core.systems.MovementSystem import MovementSystem
-from core.components.PositionComponent import PositionComponent
-from core.components.MovementComponent import MovementComponent
-from core.components.RectangleComponent import RectangleComponent
+from core.components import PositionComponent, MovementComponent, RectangleComponent
 
-import pyray as rl
 
 
 gravity_acceleration_in_pixels = 9.81 * 200  # Convert m/s^2 to pixels/s^2
@@ -24,7 +21,7 @@ square_size: int = 15
 def create_player(entity_manager: EntityManager, position: Vector2):
     player_entity = entity_manager.create_entity("player_entity")
     player_entity.add_component(PositionComponent(player_entity, position.x, position.y))
-    player_entity.add_component(RectangleComponent(player_entity, offset=Vector2(0, -square_size), size=Vector2(square_size, square_size), color=RED))
+    player_entity.add_component(RectangleComponent(player_entity, offset=Vector2(0, -square_size), size=Vector2(square_size, square_size), color=rl.RED))
     player_entity.add_component(MovementComponent(player_entity))
     # player_entity.subscribe(
     #     "MovementComponent.grounded", 
@@ -34,6 +31,14 @@ def create_player(entity_manager: EntityManager, position: Vector2):
     entity_manager.subscribe(
         "player_entity.MovementComponent.grounded",
         lambda e, c, *args, **kwargs: print(f"Player {e} is grounded: {c}"),
+    )
+
+def generate_context() -> GameContext:
+    return GameContext(
+        fps=rl.get_fps(),
+        window_size=Vector2(rl.get_screen_width(), rl.get_screen_height()),
+        delta_time=rl.get_frame_time(),
+        elapsed_time=rl.get_time()
     )
 
 def main():
@@ -48,40 +53,37 @@ def main():
 
     create_player(entity_manager, Vector2(screen_width / 2, screen_height / 2))
 
-    init_window(screen_width, screen_height, "Pyray Window")
+    rl.init_window(screen_width, screen_height, "Pyray Window")
 
-    set_target_fps(60)
+    rl.set_target_fps(60)
     
     # Main game loop
-    while not window_should_close():
+    while not rl.window_should_close():
 
         # Input handling
 
         if rl.is_mouse_button_down(MouseButton.MOUSE_BUTTON_LEFT):
-            mouse_position = get_mouse_position()
+            mouse_position = rl.get_mouse_position()
             create_player(entity_manager, mouse_position)
 
         # Update
-        delta_time = get_frame_time()
-        elapsed_time = get_time()
-        context = GameContext(get_fps(), Vector2(screen_width, screen_height), delta_time, elapsed_time)
+        context = generate_context()
 
         systems_manager.input(context, entity_manager)
         systems_manager.update(context, entity_manager)
 
-        # Update Box2D world
 
         # Draw
-        begin_drawing()
-        clear_background(RAYWHITE)
+        rl.begin_drawing()
+        rl.clear_background(rl.RAYWHITE)
         systems_manager.render(context, entity_manager)
         rl.draw_text(f"Entities: {entity_manager.entity_count()}", 10, 10, 20, rl.DARKGRAY)
-        end_drawing()
+        rl.end_drawing()
 
         entity_manager.process_queues()
 
     # De-Initialization
-    close_window()  # Close window and OpenGL context
+    rl.close_window()  # Close window and OpenGL context
 
 if __name__ == "__main__":
     main()

@@ -11,20 +11,19 @@ class MovementComponent(Component):
         GROUNDED = "grounded"
         GRAVITY = "gravity"
 
-    def __init__(self, 
-                 parent: Entity, 
-                 speed: int = 300,
-                 velocity: Vector2 = Vector2(0, 0),
-                 direction: bool = False,
-                 grounded: bool = False,
-                 gravity: bool = True
-                 ):
+    def __init__(
+            self, 
+            parent: Entity, 
+            speed: int = 300, 
+            velocity: tuple[int, int] = (0, 0),
+            gravity: bool = True,
+            ):
         super().__init__(parent)
         self._speed: int = speed
-        self._velocity: Vector2 = velocity
-        self._direction: bool = direction
-        self._grounded: bool = grounded
-        self._gravity: bool = gravity
+        self._velocity: Vector2 = Vector2(*velocity)
+        self._direction: bool = False
+        self._grounded: bool = False
+        self._gravity: bool = gravity  # Whether gravity is applied
 
     @property
     def speed(self) -> float:
@@ -73,7 +72,7 @@ class MovementComponent(Component):
     @property
     def gravity(self) -> bool:
         return self._gravity
-    
+
     @gravity.setter
     def gravity(self, value: bool):
         if self._gravity == value:

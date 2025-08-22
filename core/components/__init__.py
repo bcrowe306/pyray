@@ -1,0 +1,5 @@
+from .PositionComponent import PositionComponent
+from .MovementComponent import MovementComponent
+from .RectangleComponent import RectangleComponent
+from .AnimationComponent import AnimationComponent
+from .GameTickComponent import GameTickComponent

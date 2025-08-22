@@ -1,4 +1,4 @@
-class GameTick:
+class GameTickComponent:
 
     def __init__(self, game_tick_fps=24, tick_callback=None):
         self.game_tick = 0

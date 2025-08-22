@@ -11,8 +11,8 @@ class MovementSystem(System):
 
     def update(self, context: GameContext, em: EntityManager):
         for entity in em.get_entities_with(PositionComponent, MovementComponent):
-            pos_comp: PositionComponent = entity.get_component(PositionComponent) # type: ignore
-            move_comp: MovementComponent = entity.get_component(MovementComponent) # type: ignore
+            pos_comp: PositionComponent = entity.get_component(PositionComponent)  # type: ignore
+            move_comp: MovementComponent = entity.get_component(MovementComponent)  # type: ignore
 
             # Movement physics
             pos_comp.position.x += move_comp.velocity.x * context.delta_time
@@ -20,14 +20,15 @@ class MovementSystem(System):
 
 
             # Apply gravity if enabled
-            # Apply gravity to the vertical velocity
-            move_comp.velocity.y += self.gravity_acceleration * context.delta_time
-            if pos_comp.position.y >= context.window_size.y:
-                pos_comp.position.y = context.window_size.y
-                move_comp.velocity.y = 0
-                move_comp.grounded = True
-            else:
-                move_comp.grounded = False
+            if move_comp.gravity:
+                # Apply gravity to the vertical velocity
+                move_comp.velocity.y += self.gravity_acceleration * context.delta_time
+                if pos_comp.position.y >= context.window_size.y:
+                    pos_comp.position.y = context.window_size.y
+                    move_comp.velocity.y = 0
+                    move_comp.grounded = True
+                else:
+                    move_comp.grounded = False
 
     def render(self, context: GameContext, em: EntityManager):
         pass
