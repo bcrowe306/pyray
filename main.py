@@ -16,6 +16,18 @@ def lerp(value, i_min, i_max, o_min, o_max):
     Linear interpolation function.
     """
     return (value - i_min) / (i_max - i_min) * (o_max - o_min) + o_min
+square_size: int = 25
+
+def create_player(entity_manager: EntityManager, position: Vector2):
+    p = entity_manager.create_entity()
+    p.add_component(PositionComponent(p, position.x, position.y))
+    p.add_component(RectangleComponent(p, offset=Vector2(0, -square_size), size=Vector2(square_size, square_size), color=RED))
+    p.add_component(MovementComponent(p))
+    p.subscribe(
+        "MovementComponent.grounded", 
+        lambda c, *args, **kwargs: 
+        entity_manager.remove_entity(p)
+    )
 
 def main():
     # Initialization
@@ -27,12 +39,10 @@ def main():
     systems_manager.add_system(RectangleSystem())
     systems_manager.add_system(MovementSystem())
 
-    player = entity_manager.create_entity()
-    player.add_component(PositionComponent(player, screen_width // 2, screen_height // 2))
-    player.add_component(RectangleComponent(player, offset=Vector2(0, -50), size=Vector2(50, 50), color=RED))
-    player.add_component(MovementComponent(player))
+    create_player(entity_manager, Vector2(screen_width / 2, screen_height / 2))
 
     init_window(screen_width, screen_height, "Pyray Window")
+
     set_target_fps(60)
     
     # Main game loop
@@ -40,11 +50,9 @@ def main():
 
         # Input handling
 
-        if is_key_down(KeyboardKey.KEY_A):
-            entity_manager.get_component(player, MovementComponent).velocity.x = -300
-
-        if is_key_down(KeyboardKey.KEY_D):
-            entity_manager.get_component(player, MovementComponent).velocity.x = 300
+        if is_mouse_button_pressed(MouseButton.MOUSE_BUTTON_LEFT):
+            mouse_position = get_mouse_position()
+            create_player(entity_manager, mouse_position)
 
         # Update
         delta_time = get_frame_time()

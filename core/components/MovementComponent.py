@@ -16,6 +16,8 @@ class MovementComponent(Component):
 
     @speed.setter
     def speed(self, value: float):
+        if self._speed == value:
+            return
         self._speed = value
         self.notify("speed", value)
 
@@ -25,6 +27,8 @@ class MovementComponent(Component):
 
     @velocity.setter
     def velocity(self, value: Vector2):
+        if self._velocity == value:
+            return
         self._velocity = value
         self.notify("velocity", value)
 
@@ -34,6 +38,8 @@ class MovementComponent(Component):
 
     @direction.setter
     def direction(self, value: bool):
+        if self._direction == value:
+            return
         self._direction = value
         self.notify("direction", value)
 
@@ -43,5 +49,7 @@ class MovementComponent(Component):
 
     @grounded.setter
     def grounded(self, value: bool):
+        if self._grounded == value:
+            return
         self._grounded = value
         self.notify("grounded", value)

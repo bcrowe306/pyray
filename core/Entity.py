@@ -1,8 +1,15 @@
-class Entity:
+from .EventObject import EventObject
 
-    def __init__(self, id: int):
+
+class Entity(EventObject):
+
+    def __init__(self, parent: EventObject, id: int, name: str = None):
+        super().__init__()
         self.id: int = id
-        self.listeners: dict[str, list[callable]] = {}
+        self.parent: EventObject = parent
+        if name is None:
+            name = f"Entity_{id}"
+        self.name: str = name
         self.components: dict[type, object] = {}
 
     def add_component(self, component):
@@ -11,17 +18,11 @@ class Entity:
     def get_component(self, component_type):
         return self.components.get(component_type)
 
-    def subscribe(self, event_id: str, callback):
-        if event_id not in self.listeners:
-            self.listeners[event_id] = []
-        self.listeners[event_id].append(callback)
-
-    def unsubscribe(self, event_id: str, callback):
-        if event_id in self.listeners:
-            self.listeners[event_id].remove(callback)
+    def get_type_name(self) -> str:
+        return self.name
 
     def notify(self, event_id: str, *args, **kwargs):
-        if event_id in self.listeners:
-            for callback in self.listeners[event_id]:
-                if callable(callback):
-                    callback(*args, **kwargs)
+        if event_id in self._listeners:
+            for callback in self._listeners[event_id]:
+                callback(*args, **kwargs)
+        self.parent.notify(f"{self.get_type_name()}.{event_id}", self, *args, **kwargs)

@@ -19,7 +19,7 @@ class MovementSystem(System):
             pos_comp.position.y += move_comp.velocity.y * context.delta_time
 
             move_comp.velocity.y += self.gravity_acceleration * context.delta_time
-            if pos_comp.position.y > context.window_size.y:
+            if pos_comp.position.y >= context.window_size.y:
                 pos_comp.position.y = context.window_size.y
                 move_comp.velocity.y = 0
                 move_comp.grounded = True

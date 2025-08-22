@@ -15,6 +15,8 @@ class RectangleComponent(Component):
 
     @offset.setter
     def offset(self, value: Vector2):
+        if self._offset == value:
+            return
         self._offset = value
         self.notify("offset", value)
 
@@ -24,6 +26,8 @@ class RectangleComponent(Component):
 
     @size.setter
     def size(self, value: Vector2):
+        if self._size == value:
+            return
         self._size = value
         self.notify("size", value)
 
@@ -33,5 +37,7 @@ class RectangleComponent(Component):
 
     @color.setter
     def color(self, value: Color):
+        if self._color == value:
+            return
         self._color = value
         self.notify("color", value)

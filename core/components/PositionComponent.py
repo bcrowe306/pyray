@@ -14,5 +14,7 @@ class PositionComponent(Component):
 
     @position.setter
     def position(self, value: Vector2):
+        if self._position == value:
+            return
         self._position = value
         self.notify("position", value)
