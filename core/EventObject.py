@@ -1,16 +1,17 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 class EventObject(ABC):
 
     def __init__(self):
-        self._listeners: dict[str, list[callable]] = {}
+        self._listeners: dict[str, list[Callable]] = {}
 
-    def subscribe(self, event_id: str, callback: callable):
+    def subscribe(self, event_id: str, callback: Callable):
         if event_id not in self._listeners:
             self._listeners[event_id] = []
         self._listeners[event_id].append(callback)
 
-    def unsubscribe(self, event_id: str, callback: callable):
+    def unsubscribe(self, event_id: str, callback: Callable):
         if event_id in self._listeners:
             self._listeners[event_id].remove(callback)
 

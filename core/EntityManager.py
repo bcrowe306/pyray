@@ -4,11 +4,11 @@ from .Component import Component
 from .Entity import Entity
 from .EventObject import EventObject
 from .components import PositionComponent, MovementComponent, RectangleComponent  # Assuming these components are defined in components.py
-
+from .Layer import Layer
 class EntityManager(EventObject):
 
     # List of component types that can be added to entities
-    
+
     class Components:
         POSITION = PositionComponent
         MOVEMENT = MovementComponent
@@ -17,44 +17,57 @@ class EntityManager(EventObject):
     def __init__(self):
         super().__init__()
         self._next_id = itertools.count(1)  # unique entity IDs
-        self.entities: dict[int, Entity] = {}
-        self.__entity_removal_queue: list[int] = []
-        self.__entity_addition_queue: list[Entity] = []
-        self.__iterating_entities: bool = False
+        self.layers: dict[int, Layer] = {}
+        self.entity_layer_map: dict[int, int] = {}  # Maps entity IDs to layer IDs
 
-    def create_entity(self, name:str) -> Entity:
+    def create_entity(self, name:str, layer:int = 0) -> Entity:
+        """        Creates a new entity with a unique ID and adds it to the specified layer.
+        If the layer does not exist, it will be created."""
         entity_id: int = next(self._next_id)
         entity: Entity = Entity(self, name, entity_id)
-        self.entities[entity_id] = entity
+
+        if layer not in self.layers:
+            self.layers[layer] = Layer(f"Layer_{layer}")
+        self.layers[layer].add_entity(entity)
+        self.entity_layer_map[entity_id] = layer
         return entity
+
+    def get_sorted_layers(self) -> list[Layer]:
+        """
+        Returns a list of layers sorted by the layers dictionary key.
+        """
+        # return list of layers orderd by layers key which is an int
+        return [self.layers[key] for key in sorted(self.layers.keys())]
+
+    def get_layer(self, layer_id: int) -> Layer | None:
+        """
+        Returns the layer with the given ID, or None if it doesn't exist.
+        """
+        return self.layers.get(layer_id)
     
-    def add_entity(self, entity: Entity) -> None:
-        self.__entity_addition_queue.append(entity)
+    def get_entity(self, entity_id: int) -> Entity | None:
+        """
+        Returns the entity with the given ID, or None if it doesn't exist.
+        """
+        layer = self.entity_layer_map.get(entity_id)
+        if layer is not None and layer in self.layers:
+            return self.layers[layer].get_entity(entity_id)
+        return None
+
+    def remove_entity(self, entity: Entity) -> None:
+        layer_id = self.entity_layer_map.get(entity.id)
+        if layer_id is not None and layer_id in self.layers:
+            self.layers[layer_id].remove_entity(entity)
+            del self.entity_layer_map[entity.id]
 
     def get_new_entity_id(self) -> int:
         return next(self._next_id)
 
     def entity_count(self) -> int:
-        return len(self.entities)
-
-    def remove_entity(self, entity: Entity) -> None:
-        if self.__iterating_entities:
-
-            if entity.id not in self.__entity_removal_queue:
-                self.__entity_removal_queue.append(entity.id)
-        else:
-            if entity.id in self.entities:
-                del self.entities[entity.id]
-
-    def process_queues(self):
-        for entity in self.__entity_addition_queue:
-            self.entities[entity.id] = entity
-        self.__entity_addition_queue.clear()
-
-        for entity_id in self.__entity_removal_queue:
-            if entity_id in self.entities:
-                del self.entities[entity_id]
-        self.__entity_removal_queue.clear()
+        entity_count = 0
+        for layer in self.layers.values():
+            entity_count += layer.get_entity_count()
+        return entity_count
 
     def add_component(self, entity: Entity, component: Component) -> None:
         if entity:
@@ -65,19 +78,13 @@ class EntityManager(EventObject):
             return entity.get_component(component_type) # type: ignore
         return None
 
-    def get_entities_with(self, *component_types):
-        if not component_types:
-            return iter(self.entities.values())
-        
-        self.__iterating_entities = True
-        for entity in self.entities.values():
-            if all(entity.get_component(t) for t in component_types):
-                yield entity
-        self.__iterating_entities = False
-
     def get_type_name(self):
         return "EntityManager"
 
     def notify(self, event_id, *args, **kwargs):
         print(f"EntityManager received event: {event_id}")
         return super().notify(event_id, *args, **kwargs)
+    
+    def process_queues(self):
+        for layer in self.layers.values():
+            layer.process_queues()

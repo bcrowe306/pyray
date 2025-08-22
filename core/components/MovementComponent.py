@@ -5,11 +5,11 @@ from ..Entity import Entity
 class MovementComponent(Component):
 
     class Events:
-        SPEED = "speed"
-        VELOCITY = "velocity"
-        DIRECTION = "direction"
-        GROUNDED = "grounded"
-        GRAVITY = "gravity"
+        SPEED = "MovementComponent.speed"
+        VELOCITY = "MovementComponent.velocity"
+        DIRECTION = "MovementComponent.direction"
+        GROUNDED = "MovementComponent.grounded"
+        GRAVITY = "MovementComponent.gravity"
 
     def __init__(
             self, 
@@ -34,7 +34,7 @@ class MovementComponent(Component):
         if self._speed == value:
             return
         self._speed = value
-        self.notify(MovementComponent.Events.SPEED, value)
+        self.notify("speed", value)
 
     @property
     def velocity(self) -> Vector2:
@@ -45,7 +45,7 @@ class MovementComponent(Component):
         if self._velocity == value:
             return
         self._velocity = value
-        self.notify(MovementComponent.Events.VELOCITY, value)
+        self.notify("velocity", value)
 
     @property
     def direction(self) -> bool:
@@ -67,7 +67,7 @@ class MovementComponent(Component):
         if self._grounded == value:
             return
         self._grounded = value
-        self.notify(MovementComponent.Events.GROUNDED, value)
+        self.notify("grounded", value)
 
     @property
     def gravity(self) -> bool:
@@ -78,4 +78,4 @@ class MovementComponent(Component):
         if self._gravity == value:
             return
         self._gravity = value
-        self.notify(MovementComponent.Events.GRAVITY, value)
+        self.notify("gravity", value)
