@@ -11,13 +11,16 @@ class MovementSystem(System):
 
     def update(self, context: GameContext, em: EntityManager):
         for entity in em.get_entities_with(PositionComponent, MovementComponent):
-            pos_comp = entity.get_component(PositionComponent)
-            move_comp = entity.get_component(MovementComponent)
+            pos_comp: PositionComponent = entity.get_component(PositionComponent) # type: ignore
+            move_comp: MovementComponent = entity.get_component(MovementComponent) # type: ignore
 
             # Movement physics
             pos_comp.position.x += move_comp.velocity.x * context.delta_time
             pos_comp.position.y += move_comp.velocity.y * context.delta_time
 
+
+            # Apply gravity if enabled
+            # Apply gravity to the vertical velocity
             move_comp.velocity.y += self.gravity_acceleration * context.delta_time
             if pos_comp.position.y >= context.window_size.y:
                 pos_comp.position.y = context.window_size.y

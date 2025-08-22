@@ -3,23 +3,39 @@ from ..Component import Component
 from ..Entity import Entity
 
 class MovementComponent(Component):
-    def __init__(self, parent: Entity, speed: float = 300):
+
+    class Events:
+        SPEED = "speed"
+        VELOCITY = "velocity"
+        DIRECTION = "direction"
+        GROUNDED = "grounded"
+        GRAVITY = "gravity"
+
+    def __init__(self, 
+                 parent: Entity, 
+                 speed: int = 300,
+                 velocity: Vector2 = Vector2(0, 0),
+                 direction: bool = False,
+                 grounded: bool = False,
+                 gravity: bool = True
+                 ):
         super().__init__(parent)
         self._speed: int = speed
-        self._velocity: Vector2 = Vector2(0, 0)
-        self._direction: bool = False
-        self._grounded: bool = False
+        self._velocity: Vector2 = velocity
+        self._direction: bool = direction
+        self._grounded: bool = grounded
+        self._gravity: bool = gravity
 
     @property
     def speed(self) -> float:
         return self._speed
 
     @speed.setter
-    def speed(self, value: float):
+    def speed(self, value: int):
         if self._speed == value:
             return
         self._speed = value
-        self.notify("speed", value)
+        self.notify(MovementComponent.Events.SPEED, value)
 
     @property
     def velocity(self) -> Vector2:
@@ -30,7 +46,7 @@ class MovementComponent(Component):
         if self._velocity == value:
             return
         self._velocity = value
-        self.notify("velocity", value)
+        self.notify(MovementComponent.Events.VELOCITY, value)
 
     @property
     def direction(self) -> bool:
@@ -52,4 +68,15 @@ class MovementComponent(Component):
         if self._grounded == value:
             return
         self._grounded = value
-        self.notify("grounded", value)
+        self.notify(MovementComponent.Events.GROUNDED, value)
+
+    @property
+    def gravity(self) -> bool:
+        return self._gravity
+    
+    @gravity.setter
+    def gravity(self, value: bool):
+        if self._gravity == value:
+            return
+        self._gravity = value
+        self.notify(MovementComponent.Events.GRAVITY, value)

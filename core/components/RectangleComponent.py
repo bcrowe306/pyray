@@ -3,6 +3,12 @@ from ..Component import Component
 from ..Entity import Entity
 
 class RectangleComponent(Component):
+
+    class Events:
+        OFFSET = "offset"
+        SIZE = "size"
+        COLOR = "color"
+
     def __init__(self, parent: Entity, offset: Vector2, size: Vector2, color: Color = RED):
         super().__init__(parent)
         self._offset: Vector2 = offset
@@ -18,7 +24,7 @@ class RectangleComponent(Component):
         if self._offset == value:
             return
         self._offset = value
-        self.notify("offset", value)
+        self.notify(RectangleComponent.Events.OFFSET, value)
 
     @property
     def size(self) -> Vector2:
@@ -29,7 +35,7 @@ class RectangleComponent(Component):
         if self._size == value:
             return
         self._size = value
-        self.notify("size", value)
+        self.notify(RectangleComponent.Events.SIZE, value)
 
     @property
     def color(self) -> Color:
@@ -40,4 +46,4 @@ class RectangleComponent(Component):
         if self._color == value:
             return
         self._color = value
-        self.notify("color", value)
+        self.notify(RectangleComponent.Events.COLOR, value)

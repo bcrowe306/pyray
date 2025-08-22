@@ -4,6 +4,9 @@ from ..Entity import Entity
 
 class PositionComponent(Component):
 
+    class Events:
+        POSITION = "position"
+
     def __init__(self, parent: Entity, x: float, y: float):
         super().__init__(parent)
         self._position = Vector2(x, y)
@@ -17,4 +20,4 @@ class PositionComponent(Component):
         if self._position == value:
             return
         self._position = value
-        self.notify("position", value)
+        self.notify(PositionComponent.Events.POSITION, value)
